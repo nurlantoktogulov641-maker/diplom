@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Оставить отзыв - Travel Buddy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card auth-card">
+            <div class="card-header">
+                <h3>⭐ Оставить отзыв о {{ target_user.username }}</h3>
+                <p class="mb-0">Маршрут: {{ route.title }}</p>
+            </div>
+            <div class="card-body">
+                {% if existing %}
+                    <div class="alert alert-warning">
+                        Вы уже оставили отзыв об этом пользователе по данному маршруту.
+                    </div>
+                    <a href="{% url 'route_detail' route.id %}" class="btn btn-primary">Назад к маршруту</a>
+                {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary w-100">Отправить отзыв</button>
+                        <a href="{% url 'route_detail' route.id %}" class="btn btn-secondary w-100 mt-2">Отмена</a>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

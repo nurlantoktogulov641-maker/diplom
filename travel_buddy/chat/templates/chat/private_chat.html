@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Чат с {{ receiver.username }} - Travel Buddy{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">💬 Личный чат с {{ receiver.username }}</h4>
+            <a href="{% url 'profile' receiver.id %}" class="text-white">← Вернуться к профилю</a>
+        </div>
+        <div class="card-body" style="height: 400px; overflow-y: scroll;">
+            {% for msg in messages %}
+                <div class="mb-3 {% if msg.sender == user %}text-end{% endif %}">
+                    <div class="d-inline-block p-2 rounded {% if msg.sender == user %}bg-primary text-white{% else %}bg-light{% endif %}" style="max-width: 70%;">
+                        <strong>{{ msg.sender.username }}:</strong> {{ msg.text }}
+                        <br><small class="{% if msg.sender == user %}text-white-50{% else %}text-muted{% endif %}">{{ msg.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted">Нет сообщений. Напишите первое!</p>
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" name="text" class="form-control" placeholder="Введите сообщение..." required>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Отмечаем сообщения как прочитанные при открытии чата
+    fetch('/chat/mark-read/{{ receiver.id }}/')
+        .then(() => {
+            // Обновляем счётчик в шапке
+            if (window.parent && window.parent.updateUnreadCount) {
+                window.parent.updateUnreadCount();
+            }
+        });
+</script>
+{% endblock %}

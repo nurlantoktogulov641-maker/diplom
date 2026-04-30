@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои маршруты{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Мои маршруты</h2>
+    {% for route in routes %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ route.title }}</h5>
+                <a href="{% url 'route_detail' route.id %}" class="btn btn-primary">Подробнее</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>Нет маршрутов</p>
+    {% endfor %}
+</div>
+{% endblock %}

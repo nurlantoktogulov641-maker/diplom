@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Пожаловаться на {{ target_user.username }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">⚠️ Жалоба на пользователя {{ target_user.username }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Причина жалобы</label>
+                        {{ form.reason }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Описание</label>
+                        {{ form.description }}
+                    </div>
+                    <button type="submit" class="btn btn-danger">Отправить жалобу</button>
+                    <a href="{% url 'profile' target_user.id %}" class="btn btn-secondary">Отмена</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

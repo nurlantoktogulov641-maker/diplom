@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Чат - Travel Buddy{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">💬 Чат: {{ route.title }}</h4>
+            </div>
+            <div class="card-body" style="height: 400px; overflow-y: scroll;">
+                {% for msg in messages %}
+                    <div class="mb-3">
+                        <strong>{{ msg.sender.username }}</strong>
+                        <p class="mb-1">{{ msg.text }}</p>
+                        <small class="text-muted">{{ msg.created_at|date:"H:i" }}</small>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center">Нет сообщений. Напишите первое!</p>
+                {% endfor %}
+            </div>
+            <div class="card-footer">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" name="text" class="form-control" placeholder="Сообщение..." required>
+                        <button type="submit" class="btn btn-primary">Отпр.</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'route_detail' route.id %}" class="btn btn-secondary">← Назад к маршруту</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center fade-in">
+    <div class="col-md-8">
+        <div class="card auth-card">
+            <div class="card-header">
+                <h3 class="mb-0">✈️ Создать новый маршрут</h3>
+                <p class="mb-0 mt-2 text-white-50">Поделись своим путешествием</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.title.label }}</label>
+                        {{ form.title }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.description.label }}</label>
+                        {{ form.description }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.countries.label }}</label>
+                        {{ form.countries }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.cities.label }}</label>
+                        {{ form.cities }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">📍 Город для карты</label>
+                        <input type="text" name="city" class="form-control" value="{{ form.city.value|default:'' }}" placeholder="Например: Красноярск">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">🚀 Город отправления</label>
+                                <input type="text" name="start_city" class="form-control" value="{{ form.start_city.value|default:'' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">🏁 Город назначения</label>
+                                <input type="text" name="end_city" class="form-control" value="{{ form.end_city.value|default:'' }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">📍 Промежуточные точки (через запятую)</label>
+                        <input type="text" name="waypoints" class="form-control" value="{{ form.waypoints.value|default:'' }}">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">{{ form.start_date.label }}</label>
+                                {{ form.start_date }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">{{ form.end_date.label }}</label>
+                                {{ form.end_date }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.budget.label }}</label>
+                        {{ form.budget }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.tags.label }}</label>
+                        {{ form.tags }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ form.image.label }}</label>
+                        {{ form.image }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">🖼️ Дополнительные изображения</label>
+                        <input type="file" name="extra_images" multiple class="form-control">
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Отмена</a>
+                        <button type="submit" class="btn btn-primary">Создать маршрут</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDate = document.querySelector('input[name="start_date"]');
+        const endDate = document.querySelector('input[name="end_date"]');
+        
+        if (startDate && endDate) {
+            function validateDates() {
+                if (startDate.value && endDate.value && endDate.value < startDate.value) {
+                    alert('Дата окончания не может быть раньше даты начала!');
+                    endDate.value = '';
+                }
+            }
+            
+            startDate.addEventListener('change', validateDates);
+            endDate.addEventListener('change', validateDates);
+        }
+    });
+</script>
+{% endblock %}

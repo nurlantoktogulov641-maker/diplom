@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои отклики{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Мои отклики</h2>
+    {% for response in responses %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>{{ response.route.title }}</h5>
+                <p>Статус: {{ response.get_status_display }}</p>
+                <a href="{% url 'route_detail' response.route.id %}" class="btn btn-primary">Перейти</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>Нет откликов</p>
+    {% endfor %}
+</div>
+{% endblock %}

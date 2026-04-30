@@ -1,0 +1,181 @@
+{% extends 'admin/base_site.html' %}
+
+{% block title %}Статистика - Travel Buddy{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .dashboard-card {
+        transition: transform 0.2s;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+    }
+    .stat-label {
+        font-size: 14px;
+        color: #6c757d;
+    }
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mb-4">📊 Статистика Travel Buddy</h1>
+    
+    <!-- Карточки с цифрами -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-body">
+                    <div class="stat-number text-primary">{{ total_users }}</div>
+                    <div class="stat-label">👥 Пользователей</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-body">
+                    <div class="stat-number text-success">{{ total_routes }}</div>
+                    <div class="stat-label">🗺️ Всего маршрутов</div>
+                    <small class="text-muted">(активных: {{ active_routes }})</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-body">
+                    <div class="stat-number text-info">{{ total_responses }}</div>
+                    <div class="stat-label">✉️ Откликов</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card dashboard-card text-center">
+                <div class="card-body">
+                    <div class="stat-number text-warning">{{ total_reviews }}</div>
+                    <div class="stat-label">⭐ Отзывов</div>
+                    <small class="text-muted">(ср. рейтинг: {{ avg_rating }})</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Графики -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>📈 Регистрации пользователей (30 дней)</h5>
+                <canvas id="registrationsChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>📝 Создание маршрутов (30 дней)</h5>
+                <canvas id="routesChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Таблицы -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>🔥 Популярные маршруты</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Название</th><th>Откликов</th><th>Просмотров</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for route in popular_routes %}
+                        <tr>
+                            <td><a href="{% url 'route_detail' route.id %}" target="_blank">{{ route.title|truncatechars:30 }}</a></td>
+                            <td>{{ route.response_count }}</td>
+                            <td>{{ route.views_count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">Нет данных</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5>🏆 Самые активные пользователи</h5>
+                <table class="table table-striped">
+                    <thead>
+                        <td><th>Пользователь</th><th>Откликов</th><th>Маршрутов</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for user in active_users %}
+                        <tr>
+                            <td><a href="{% url 'profile' user.id %}" target="_blank">{{ user.username }}</a></td>
+                            <td>{{ user.response_count }}</td>
+                            <td>{{ user.routes.count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">Нет данных</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-3">
+        <a href="{% url 'admin:index' %}" class="btn btn-secondary">← Назад в админку</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // График регистраций
+    const regCtx = document.getElementById('registrationsChart').getContext('2d');
+    new Chart(regCtx, {
+        type: 'line',
+        data: {
+            labels: {{ reg_days|safe }},
+            datasets: [{
+                label: 'Регистрации',
+                data: {{ reg_counts|safe }},
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: true }
+    });
+    
+    // График маршрутов
+    const routeCtx = document.getElementById('routesChart').getContext('2d');
+    new Chart(routeCtx, {
+        type: 'line',
+        data: {
+            labels: {{ route_days|safe }},
+            datasets: [{
+                label: 'Маршруты',
+                data: {{ route_counts|safe }},
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: true }
+    });
+</script>
+{% endblock %}

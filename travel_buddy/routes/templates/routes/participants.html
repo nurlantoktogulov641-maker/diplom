@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Участники маршрута: {{ route.title }}</h2>
+    <div class="row">
+        {% for p in participants %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ p.user.username }}</h5>
+                    <p>⭐ Рейтинг: {{ p.user.rating|default:"0" }}</p>
+                    <a href="{% url 'profile' p.user.id %}" class="btn btn-sm btn-outline-primary">Профиль</a>
+                    <a href="{% url 'chat_room' route.id %}" class="btn btn-sm btn-info">Чат</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>Пока нет участников</p>
+        {% endfor %}
+    </div>
+    <a href="{% url 'route_detail' route.id %}" class="btn btn-secondary">Назад</a>
+</div>
+{% endblock %}
